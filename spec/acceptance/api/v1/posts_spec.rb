@@ -1,16 +1,20 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe 'Posts API' do
   it 'sends the list of posts using the default filter' do
+    user = User.create(username: 'Test User')
+
     posts = [
-      Post.create(name: 'test'),
-      Post.create(name: 'test 2')
+      Post.create(name: 'test', user: user),
+      Post.create(name: 'test 2', user: user)
     ]
 
     get '/api/v1/posts'
 
     expect(last_response.status).to eq(200)
-    json = JSON.parse(last_response.body)
+    json = JSON.parse(last_response.body)[0]
+
+    binding.pry
 
     expect(json['posts'].length).to eq(posts.count)
   end
@@ -21,7 +25,7 @@ describe 'Posts API' do
     end
 
     get '/api/v1/posts?page%5Boffset%5D=1'
-    json = JSON.parse(last_response.body)
+    json = JSON.parse(last_response.body)[0]
     expect(json['posts'].length).to eq(25)
 
   end
@@ -32,7 +36,7 @@ describe 'Posts API' do
     end
 
     get '/api/v1/posts?page%5Boffset%5D=2'
-    json = JSON.parse(last_response.body)
+    json = JSON.parse(last_response.body)[0]
     expect(json['posts'].length).to eq(15)
 
   end
@@ -44,7 +48,7 @@ describe 'Posts API' do
     end
 
     get '/api/v1/posts?page%5Boffset%5D=-1'
-    json = JSON.parse(last_response.body)
+    json = JSON.parse(last_response.body)[0]
     expect(json['posts'].length).to eq(25)
 
   end
@@ -56,7 +60,7 @@ describe 'Posts API' do
     end
 
     get '/api/v1/posts?page%5Boffset%5D=3'
-    json = JSON.parse(last_response.body)
+    json = JSON.parse(last_response.body)[0]
     expect(json['posts'].length).to eq(0)
   end
 
@@ -67,7 +71,7 @@ describe 'Posts API' do
     end
 
     get '/api/v1/posts?page%5Bsize%5D=10'
-    json = JSON.parse(last_response.body)
+    json = JSON.parse(last_response.body)[0]
     expect(json['posts'].length).to eq(10)
 
   end
@@ -79,7 +83,7 @@ describe 'Posts API' do
     end
 
     get '/api/v1/posts?page%5Bsize%5D=-10'
-    json = JSON.parse(last_response.body)
+    json = JSON.parse(last_response.body)[0]
     expect(json['posts'].length).to eq(25)
 
   end
@@ -91,7 +95,7 @@ describe 'Posts API' do
     end
 
     get '/api/v1/posts?page%5Bsize%5D=100'
-    json = JSON.parse(last_response.body)
+    json = JSON.parse(last_response.body)[0]
     expect(json['posts'].length).to eq(40)
   end
 
@@ -102,7 +106,7 @@ describe 'Posts API' do
     end
 
     get '/api/v1/posts'
-    json = JSON.parse(last_response.body)
+    json = JSON.parse(last_response.body)[0]
     expect(json['posts'].length).to eq(100)
 
   end
@@ -115,7 +119,7 @@ describe 'Posts API' do
     Kaminari.config.max_per_page = 10
 
     get '/api/v1/posts?page%5Bsize%5D=100'
-    json = JSON.parse(last_response.body)
+    json = JSON.parse(last_response.body)[0]
     expect(json['posts'].length).to eq(10)
   end
 
@@ -132,7 +136,7 @@ describe 'Posts API' do
       '&ids%5B%5D=' + filtered_posts[1].id.to_s
 
     expect(last_response.status).to eq(200)
-    json = JSON.parse(last_response.body)
+    json = JSON.parse(last_response.body)[0]
 
     expect(json['posts'].length).to eq(filtered_posts.count)
   end
@@ -143,7 +147,7 @@ describe 'Posts API' do
     end
 
     get '/api/v1/posts?sort%5Bcriteria%5D=id&sort%5Breverse%5D=true'
-    json = JSON.parse(last_response.body)
+    json = JSON.parse(last_response.body)[0]
     expect(json['posts'].last['name']).to eq('Post0')
   end
 
@@ -153,7 +157,7 @@ describe 'Posts API' do
     end
 
     get '/api/v1/posts?page%5Boffset%5D=1&page%5Bsize%5D=10&sort%5Bcriteria%5D=id&sort%5Breverse%5D=true'
-    json = JSON.parse(last_response.body)
+    json = JSON.parse(last_response.body)[0]
     expect(json['posts'].first['name']).to eq('Post19')
     expect(json['posts'].length).to eq(10)
   end

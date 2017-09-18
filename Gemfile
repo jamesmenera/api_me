@@ -2,13 +2,10 @@ source 'https://rubygems.org'
 
 gemspec
 
+gem 'pg'
+gem 'batch-loader'
+
 group :test do
-  gem 'pry'
-  gem 'activerecord'
-  gem 'activesupport'
-  gem 'actionpack' # action_controller, action_view
-  gem 'combustion', '~> 0.5.2'
-  gem 'rack-test'
-  gem 'pundit'
-  gem 'active_model_serializers', '~> 0.10.0'
+  gem 'rb-readline'
+  gem 'pry-byebug'
 end
